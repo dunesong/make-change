@@ -50,6 +50,22 @@ has 'descr' => (
 
 
 ################################################################################
+# The CurrencyAmount class models the amount of change due.
+################################################################################
+
+package CurrencyAmount;
+
+use Moose;
+
+extends 'Currency';
+
+has 'amount' => (
+    is => 'rw'
+    , isa => 'Int'
+);
+
+
+################################################################################
 # The MoneySystem class models a collection of physical currencies that make
 # up a national currency (e.g. the US Dollar, the Japanese Yen).
 ################################################################################
@@ -75,22 +91,6 @@ has 'descr' => (
 has 'currencies' => (
     is => 'rw'
     , isa => 'ArrayRefOfCurrencies'
-);
-
-
-################################################################################
-# The CurrencyAmount class models the amount of change due.
-################################################################################
-
-package CurrencyAmount;
-
-use Moose;
-
-extends 'Currency';
-
-has 'amount' => (
-    is => 'rw'
-    , isa => 'Int'
 );
 
 
@@ -138,7 +138,11 @@ sub make_change {
     printf("\$%.2f change is due\n", $change / 100);
 
     my $remainder = $change;
-    foreach my $currency (@{$self->currencies}) {
+    # ensure that the currencies are in reverse sort order based on the value
+    my @sorted_currencies = 
+        sort {$b->{value} <=> $a->{value}} @{$self->{currencies}};
+
+    foreach my $currency (@sorted_currencies) {
         if(0 < $remainder && $currency->{value} <= $remainder) {
             printf(
                 "%d x %s\n"

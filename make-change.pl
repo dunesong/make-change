@@ -6,14 +6,24 @@ use warnings;
 use File::Basename qw/basename/;
 use Scalar::Util qw/looks_like_number/;
 # Math::Currency would be preferrable but is unavailable
-use Math::Round qw/nearest_ceil/;
+use Math::Round qw/round nearest_ceil/;
 
 use 5.010;
 
 my $PROGRAM = basename($0);
 my $USAGE = "usage: $PROGRAM amount_due amount_tendered";
 
-my $smallest_denomination = 0.01;
+my @denominations = (
+    # in cents
+      2000
+    , 1000
+    ,  500
+    ,  100
+    ,   25
+    ,   10
+    ,    5
+    ,    1
+);
 
 unless(scalar(@ARGV) == 2) { say $USAGE and exit 1; }
 
@@ -38,7 +48,21 @@ unless($tendered >= $due) {
 }
 
 # round in customer's favor when halfway between two choices
-say nearest_ceil($smallest_denomination, $tendered - $due);
+my $change = round(($tendered - $due) * 100);
+
+my $remainder = $change;
+my %currency_due = ();
+foreach my $denomination (@denominations) {
+    if(0 < $remainder && $denomination <= $remainder) {
+        $currency_due{$denomination} = int($remainder / $denomination);
+        $remainder = $remainder % $denomination;
+    }
+}
+
+say sprintf('$%.2f is due', $change / 100);
+foreach my $denomination (keys %currency_due) {
+    say "$currency_due{$denomination} x $denomination cents";
+}
 
 ################################################################################
 

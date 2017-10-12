@@ -29,23 +29,7 @@ unless(scalar(@ARGV) == 2) { say $USAGE and exit 1; }
 
 my($due, $tendered) = @ARGV;
 
-unless(looks_like_number($due)) { 
-    report_error("amount due ($due) is not a number");
-}
-unless(looks_like_number($tendered)) { 
-    report_error("amount tendered ($tendered) is not a number");
-}
-unless($due >= 0) {
-    report_error("amount due ($due) must be non-negative");
-}
-unless($tendered >= 0) {
-    report_error("amount tendered ($tendered) must be non-negative");
-}
-unless($tendered >= $due) {
-    report_error(
-        "amount tendered ($tendered) must not be less than amount due ($due)"
-    );
-}
+test_input($due, $tendered);
 
 # round in customer's favor when halfway between two choices
 my $change = round(($tendered - $due) * 100);
@@ -66,6 +50,28 @@ foreach my $denomination (keys %currency_due) {
 
 ################################################################################
 
+sub test_input {
+    my($due, $tendered) = (@_);
+
+    unless(looks_like_number($due)) { 
+        report_error("amount due ($due) is not a number");
+    }
+    unless(looks_like_number($tendered)) { 
+        report_error("amount tendered ($tendered) is not a number");
+    }
+    unless($due >= 0) {
+        report_error("amount due ($due) must be non-negative");
+    }
+    unless($tendered >= 0) {
+        report_error("amount tendered ($tendered) must be non-negative");
+    }
+    unless($tendered >= $due) {
+        report_error(
+            "amount tendered ($tendered) must not be less than "
+            . "amount due ($due)"
+        );
+    }
+}
 sub report_error {
     my($message) = (@_);
     my $PROGRAM = basename($0);

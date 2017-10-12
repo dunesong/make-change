@@ -106,7 +106,7 @@ extends 'MoneySystem';
 
 use Scalar::Util qw/looks_like_number/;
 # Math::Currency would be preferrable to Math::Round but is unavailable
-use Math::Round qw/round nearest_ceil/;
+use Math::Round qw/round/;
 use Carp qw/croak confess/;
 
 has 'currency_due' => (

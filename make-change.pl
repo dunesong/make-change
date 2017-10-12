@@ -5,11 +5,15 @@ use warnings;
 
 use File::Basename qw/basename/;
 use Scalar::Util qw/looks_like_number/;
+# Math::Currency would be preferrable but is unavailable
+use Math::Round qw/nearest_ceil/;
 
 use 5.010;
 
 my $PROGRAM = basename($0);
 my $USAGE = "usage: $PROGRAM amount_due amount_tendered";
+
+my $smallest_denomination = 0.01;
 
 unless(scalar(@ARGV) == 2) { say $USAGE and exit 1; }
 
@@ -33,7 +37,8 @@ unless($tendered >= $due) {
     );
 }
 
-say $tendered - $due;
+# round in customer's favor when halfway between two choices
+say nearest_ceil($smallest_denomination, $tendered - $due);
 
 ################################################################################
 

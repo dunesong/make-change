@@ -50,7 +50,7 @@ has 'descr' => (
 
 
 ################################################################################
-# The CurrencyAmount class models the amount of change due.
+# The CurrencyAmount class models the amount of a particular currency.
 ################################################################################
 
 package CurrencyAmount;
@@ -62,6 +62,31 @@ extends 'Currency';
 has 'amount' => (
     is => 'rw'
     , isa => 'Int'
+);
+
+
+################################################################################
+# The ChangeDue class models the amount of change due.
+################################################################################
+
+package ChangeDue;
+
+use Moose;
+
+has 'currencies' => (
+    is => 'rw'
+    , isa => 'ArrayRefOfCurrencyAmounts'
+    , default => sub{ [] }
+);
+
+has 'amount_due' => (
+    is => 'rw'
+    , isa => 'Num'
+);
+
+has 'error' => (
+    is => 'rw'
+    , isa => 'Str'
 );
 
 
@@ -91,6 +116,7 @@ has 'descr' => (
 has 'currencies' => (
     is => 'rw'
     , isa => 'ArrayRefOfCurrencies'
+    , default => sub{ [] }
 );
 
 
@@ -109,49 +135,61 @@ use Scalar::Util qw/looks_like_number/;
 use Math::Round qw/round/;
 use Carp qw/croak confess/;
 
-has 'currency_due' => (
-    is => 'rw'
-    , isa => 'ArrayRefOfCurrencyAmounts'
-);
-
 sub make_change {
     my ($self, $due, $tendered) = @_;
 
-    croak "amount due ($due) is not a number"
-        unless(looks_like_number($due));
+    unless(looks_like_number($due)) {
+        return ChangeDue->new(error => "amount due ($due) is not a number");
+    }
     
-    croak "amount tendered ($tendered) is not a number"
-        unless(looks_like_number($tendered)); 
+    unless(looks_like_number($tendered)) { 
+        return ChangeDue->new(
+            error => "amount tendered ($tendered) is not a number"
+        );
+    }
 
-    croak "amount due ($due) must be non-negative"
-        unless($due >= 0);
+    unless($due >= 0) {
+        return ChangeDue->new(
+            error => "amount due ($due) must be non-negative"
+        );
+    }
 
-    croak "amount tendered ($tendered) must be non-negative"
-        unless($tendered >= 0);
+    unless($tendered >= 0) {
+        return ChangeDue->new(
+            error => "amount tendered ($tendered) must be non-negative"
+        );
+    }
 
-    croak "amount tendered ($tendered) must not be less than amount due ($due)"
-        unless($tendered >= $due);
+    unless($tendered >= $due) {
+        return ChangeDue->new(
+            error => "amount tendered ($tendered) must not be less than "
+                     . "amount due ($due)"
+        );
+    }
+
+    my $change = ChangeDue->new();
 
     # round in customer's favor when halfway between two choices
-    my $change = round(($tendered - $due) * 100);
+    $change->amount_due(round(($tendered - $due) * 100));
 
-    printf("\$%.2f change is due\n", $change / 100);
+    my $remainder = $change->amount_due;
 
-    my $remainder = $change;
     # ensure that the currencies are in reverse sort order based on the value
     my @sorted_currencies = 
         sort {$b->{value} <=> $a->{value}} @{$self->{currencies}};
 
     foreach my $currency (@sorted_currencies) {
         if(0 < $remainder && $currency->{value} <= $remainder) {
-            printf(
-                "%d x %s\n"
-                , int($remainder / $currency->{value})
-                , $currency->{descr}
-            );
+            push(@{$change->currencies}, CurrencyAmount->new(
+                amount => int($remainder / $currency->{value})
+                , value => $currency->value
+                , descr => $currency->descr
+            ));
             $remainder = $remainder % $currency->{value};
         }
     }
+
+    return $change;
 }
 
 ################################################################################

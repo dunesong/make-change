@@ -42,14 +42,13 @@ if($q->cgi_error) {
 }
 elsif($mode eq 'json' && defined $change->{error}) {
     my $http_status = '400 Bad Request (invalid input parameters)';
-    print $q->header(-status => $http_status, -charset => 'utf-8')
-        , $q->start_html(
-            -title => 'Invalid Input Parameters'
-            , -encoding => 'utf-8'
-          )
-        , $q->h1($http_status)
-        , $q->p($change->{error})
-        , $q->end_html
+    print $q->header(
+            -type => 'application/json'
+            , -status => $http_status
+            , -charset => 'utf-8'
+        )
+        , $change->to_json()
+        , "\n"
     ;
 }
 elsif($mode eq 'json') {
@@ -63,15 +62,12 @@ else {
 
     my $results_div = '';
     if($due && $tendered) {
-        $results_div = '<div id="results" class="row">';
-        $results_div .= '<div class="col-sm-4"></div>';
         if(defined $change->error) {
-            $results_div .= '<p class="alert alert-danger col-sm-4">';
+            $results_div .= '<p class="alert alert-danger">';
             $results_div .= $change->error;
             $results_div .= '</p>';
         }
         else {
-            $results_div .= '<div class="col-sm-4">';
             $results_div .= '<table class="table table-striped"><tbody>';
             if($change->amount_due || 0 == $change->amount_due) {
                 $results_div .= '<tr scope="row" class="info">';
@@ -92,10 +88,7 @@ else {
                 }
             }
             $results_div .= '</tbody></table>';
-            $results_div .= '</div>';
         }
-        $results_div .= '<div class="col-sm-4"></div>';
-        $results_div .= '</div>';
     }
 
 
@@ -114,13 +107,14 @@ else {
     <link rel="stylesheet" href="style/style.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="scripts/ajax.js"></script>
   </head>
 
   <body>
     <div class="container-fluid">
       <div class="row">
         <div class="col-sm-4"></div>
-        <form action="$cgi_path" method="get" class="col-sm-4">
+        <form action="$cgi_path" method="get" id="change-form" class="col-sm-4">
           <div class="form-group">
             <label for="due">Amount due:</label>
             <input type="text" id="due" name="due" placeholder="Enter amount due" value="$due" class="form-control">
@@ -133,7 +127,13 @@ else {
         </form>
         <div class="col-sm-4"></div>
       </div>
-      $results_div
+      <div class="row">
+        <div class="col-sm-4"></div>
+        <div id="results" class="col-sm-4">
+          $results_div
+        </div>
+        <div class="col-sm-4"></div>
+      </div>
     </div>
   </body>
 </html>

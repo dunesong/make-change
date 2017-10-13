@@ -1,5 +1,8 @@
 RewriteEngine on
 
+RewriteCond %{DOCUMENT_ROOT}/scripts/%{REQUEST_URI} -f
+RewriteRule ^(.*) scripts/$1 [L]
+
 RewriteCond %{DOCUMENT_ROOT}/style/%{REQUEST_URI} -f
 RewriteRule ^(.*) style/$1 [L]
 

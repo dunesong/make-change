@@ -62,32 +62,38 @@ else {
     my $results_div = '';
 
     if($due && $tendered) {
-        $results_div = '<div class="row">';
+        $results_div = '<div id="results" class="row">';
+        $results_div .= '<div class="col-sm-4"></div>';
         if(defined $change->error) {
-            $results_div .= '<p>';
+            $results_div .= '<p class="alert alert-danger col-sm-4">';
             $results_div .= $change->error;
             $results_div .= '</p>';
         }
         else {
-            $results_div .= '<table><tbody>';
+            $results_div .= '<div class="col-sm-4">';
+            $results_div .= '<table class="table table-striped"><tbody>';
             if($change->amount_due) {
-                $results_div .= '<tr scope="row"><th>Amount Due</th><td>';
+                $results_div .= '<tr scope="row" class="info">';
+                $results_div .= '<th>Amount Due</th><td>';
                 $results_div .= sprintf('$%.2f', $change->amount_due);
                 $results_div .= '</td></tr>';
             }
-            $results_div .= '<tr><th scope="col">Quantity</th>'
+            $results_div .= '<tr>'
+                . '<th scope="col" id="quantity-header">Quantity</th>'
                 . '<th scope="col">Currency</th></tr>';
             if($change->currencies) {
                 foreach my $currency (@{$change->currencies}) {
-                    $results_div .= '<tr><td>';
+                    $results_div .= '<tr><td align="right">';
                     $results_div .= $currency->amount;
-                    $results_div .= '</td><td>';
+                    $results_div .= ' &times;</td><td>';
                     $results_div .= $currency->descr;
                     $results_div .= '</td></tr>';
                 }
             }
             $results_div .= '</tbody></table>';
+            $results_div .= '</div>';
         }
+        $results_div .= '<div class="col-sm-4"></div>';
         $results_div .= '</div>';
     }
 
@@ -103,7 +109,7 @@ else {
     <meta name="description" content="make change based on amount due and amount tendered">
     <meta name="author" content="jonathan\@dunesong.com">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style/style.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
   </head>
@@ -111,7 +117,8 @@ else {
   <body>
     <div class="container-fluid">
       <div class="row">
-        <form action="make-change.cgi" method="get" class="form-inline">
+        <div class="col-sm-4"></div>
+        <form action="make-change.cgi" method="get" class="col-sm-4">
           <div class="form-group">
             <label for="due">Amount due:</label>
             <input type="text" id="due" name="due" placeholder="Enter amount due" value="$due" class="form-control">
@@ -122,8 +129,9 @@ else {
           </div>
           <button type="submit" class="btn btn-default">Make Change</button>
         </form>
-        $results_div
+        <div class="col-sm-4"></div>
       </div>
+      $results_div
     </div>
   </body>
 </html>

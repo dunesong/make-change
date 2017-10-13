@@ -182,8 +182,8 @@ sub make_change {
     unless(length($due) < $self->max_length) {
         return ChangeDue->new(
             error => 'amount due exceeds the maximum argument length ('
-              . $self->max_length
-              . ')'
+                . $self->max_length
+                . ' characters)'
         );
     }
 
@@ -191,7 +191,7 @@ sub make_change {
         return ChangeDue->new(
             error => 'amount tendered exceeds the maximum argument length ('
                 . $self->max_length
-                . ')'
+                . ' characters)'
         );
     }
 

@@ -49,6 +49,7 @@ has 'descr' => (
 );
 
 
+
 ################################################################################
 # The CurrencyAmount class models the amount of a particular currency.
 ################################################################################
@@ -63,6 +64,22 @@ has 'amount' => (
     is => 'rw'
     , isa => 'Int'
 );
+
+sub to_json {
+    my($self) = @_;
+
+    my $json = '{';
+    if($self->amount) {
+        $json .= sprintf('"amount": %d', $self->amount);
+    }
+    if($self->value) {
+        $json .= sprintf(', "value": %d', $self->value);
+    }
+    if($self->descr) {
+        $json .= sprintf(', "descr": "%s"', $self->descr);
+    }
+    $json .= '}';
+}
 
 
 ################################################################################
@@ -89,6 +106,25 @@ has 'error' => (
     , isa => 'Str'
 );
 
+sub to_json {
+    my($self) = @_;
+
+    my $json = '{';
+    if($self->amount_due) {
+        $json .= sprintf('"amount_due": %.2f', $self->amount_due);
+    }
+    if($self->error) {
+        $json .= sprintf(', "error": %s', $self->error);
+    }
+    if($self->currencies) {
+        $json .= ', "currencies":[';
+        foreach my $currency (@{$self->currencies}) {
+            $json .= $currency->to_json()
+        }
+        $json .= ']';
+    }
+    $json .= '}';
+}
 
 ################################################################################
 # The MoneySystem class models a collection of physical currencies that make
@@ -169,10 +205,10 @@ sub make_change {
 
     my $change = ChangeDue->new();
 
-    # round in customer's favor when halfway between two choices
-    $change->amount_due(round(($tendered - $due) * 100));
+    $change->amount_due($tendered - $due);
 
-    my $remainder = $change->amount_due;
+    # round in customer's favor when halfway between two choices
+    my $remainder = round(100 * $change->amount_due);
 
     # ensure that the currencies are in reverse sort order based on the value
     my @sorted_currencies = 

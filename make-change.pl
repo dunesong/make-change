@@ -21,9 +21,9 @@ my $usd = create_usd();
 
 my $change = $usd->make_change($due, $tendered);
 
-printf("\$%.2f change is due\n", $change->amount_due / 100);
+printf("\$%.2f change is due\n", $change->amount_due);
 foreach my $currency (@{$change->currencies}) {
-    printf("%d x %s\n", $currency->{amount}, $currency->{descr});
+    printf("%d x %s\n", $currency->amount, $currency->descr);
 }
 
 ################################################################################

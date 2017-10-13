@@ -1,16 +1,48 @@
 $(function() {
     $("#change-form").submit(function(event) {
         event.preventDefault();
-        $.getJSON(
-            "make-change.cgi?mode=json" 
+        $("#results").empty();
+        $.ajax({
+            type: "GET"
+            , url: "?mode=json" 
               + "&due=" + encodeURIComponent($("#due").val())
               + "&tendered=" + encodeURIComponent($("#tendered").val())
-            , function(result) {
-                $.each(result.currencies, function(i, field) {
-                    window.alert(field.descr);
-                });
+            , error: function(xhr, status, error) {
+                result = JSON.parse(xhr.responseText);
+                message = "";
+                message += '<p class="alert alert-danger">';
+                message += result.error;
+                message += "</p>";
+                $("#results").append(message);
               }
-        );
+            , success: function(result) {
+                message = "";
+                message += '<table class="table table-striped">';
+                message += '<tbody>';
+                if(result.amount_due || 0 == result.amount_due) {
+                    message += '<tr scope="row" class="info">';
+                    message += '<th>Amount Due</th><td>';
+                    message += '$' + result.amount_due.toFixed(2);
+                    message += '</td></tr>';
+                }
+                message += '<tr>';
+                message += '<th scope="col" id="quantity-header">';
+                message += 'Quantity';
+                message += '</th>';
+                message += '<th scope="col">Currency</th></tr>';
+                if(result.currencies) {
+                    $.each(result.currencies, function(i, field) {
+                        message += '<tr><td align="right">';
+                        message += field.amount;
+                        message += " &times;</td><td>";
+                        message += field.descr;
+                        message += '</td></tr>';
+                    });
+                }
+                message += '</tbody></table>';
+                $("#results").append(message);
+              }
+        });
     });
 });
 

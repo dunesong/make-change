@@ -43,15 +43,17 @@ sub to_json {
     my($self) = @_;
 
     my $json = '{';
+    my @fields = ();
     if($self->amount) {
-        $json .= sprintf('"amount": %d', $self->amount);
+        push(@fields, sprintf('"amount": %d', $self->amount));
     }
     if($self->value) {
-        $json .= sprintf(', "value": %d', $self->value);
+        push(@fields, sprintf('"value": %d', $self->value));
     }
     if($self->descr) {
-        $json .= sprintf(', "descr": "%s"', $self->descr);
+        push(@fields, sprintf('"descr": "%s"', $self->descr));
     }
+    $json .= join(',', @fields);
     $json .= '}';
 }
 
@@ -91,21 +93,24 @@ sub to_json {
     my($self) = @_;
 
     my $json = '{';
+    my @fields = ();
     if($self->amount_due) {
-        $json .= sprintf('"amount_due": %.2f', $self->amount_due);
+        push(@fields, sprintf('"amount_due": %.2f', $self->amount_due));
     }
     if($self->error) {
-        $json .= sprintf(', "error": %s', $self->error);
+        push(@fields, sprintf('"error": "%s"', $self->error));
     }
     if($self->currencies) {
-        $json .= ', "currencies":[';
+        my $curr_json .= '"currencies":[';
         my @currencies = ();
         foreach my $currency (@{$self->currencies}) {
             push(@currencies, $currency->to_json());
         }
-        $json .= join(',', @currencies);
-        $json .= ']';
+        $curr_json .= join(',', @currencies);
+        $curr_json .= ']';
+        push(@fields, $curr_json);
     }
+    $json .= join(',', @fields);
     $json .= '}';
 }
 

@@ -64,6 +64,7 @@ else {
     if($due && $tendered) {
         if(defined $change->error) {
             $results_div .= '<p class="alert alert-danger">';
+            $results_div .= '<strong>Error:</strong> ';
             $results_div .= $change->error;
             $results_div .= '</p>';
         }

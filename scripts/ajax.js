@@ -20,12 +20,13 @@ $(function() {
                 message = "";
                 message += '<table class="table table-striped">';
                 message += '<tbody>';
-                if(result.amount_due || 0 == result.amount_due) {
+                //if(result.amount_due || 0 == result.amount_due) {
+                    window.alert(result.amount_due);
                     message += '<tr scope="row" class="info">';
                     message += '<th>Amount Due</th><td>';
                     message += '$' + result.amount_due.toFixed(2);
                     message += '</td></tr>';
-                }
+                //}
                 message += '<tr>';
                 message += '<th scope="col" id="quantity-header">';
                 message += 'Quantity';

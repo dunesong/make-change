@@ -44,7 +44,7 @@ sub to_json {
 
     my $json = '{';
     my @fields = ();
-    if($self->amount) {
+    if($self->amount || 0 == $self->amount) {
         push(@fields, sprintf('"amount": %d', $self->amount));
     }
     if($self->value) {
@@ -94,7 +94,7 @@ sub to_json {
 
     my $json = '{';
     my @fields = ();
-    if($self->amount_due) {
+    if($self->amount_due || 0 == $self->amount_due) {
         push(@fields, sprintf('"amount_due": %.2f', $self->amount_due));
     }
     if($self->error) {

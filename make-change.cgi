@@ -15,13 +15,16 @@ use MakeChange;
 my $q = CGI->new;
 
 my $usd = create_usd();
+my $due = '';
+my $tendered = '';
+my $mode = 'html';
 
-my $due = $q->param('due');
-$due = '' unless defined $due;
-my $tendered = $q->param('tendered');
-$tendered = '' unless defined $tendered;
-my $mode = $q->param('mode');
-$mode = 'html' unless defined $mode;
+$due = strip_non_numeric($q->param('due'))
+    if(defined $q->param('due'));
+$tendered = strip_non_numeric($q->param('tendered'))
+    if(defined $q->param('tendered'));
+$mode = $q->param('mode')
+    if(defined $q->param('mode'));
 
 my $change = $usd->make_change($due, $tendered);
 
@@ -60,23 +63,31 @@ else {
 
     if($due && $tendered) {
         $results_div = '<div class="row">';
-        $results_div .= '<table><tbody>';
-        if($change->amount_due) {
-            $results_div .= '<tr scope="row"><th>Amount Due</th><td>';
-            $results_div .= sprintf('$%.2f', $change->amount_due);
-            $results_div .= '</td></tr>';
+        if(defined $change->error) {
+            $results_div .= '<p>';
+            $results_div .= $change->error;
+            $results_div .= '</p>';
         }
-        $results_div .= '<tr><th scope="col">Quantity</th><th scope="col">Currency</th></tr>';
-        if($change->currencies) {
-            foreach my $currency (@{$change->currencies}) {
-                $results_div .= '<tr><td>';
-                $results_div .= $currency->amount;
-                $results_div .= '</td><td>';
-                $results_div .= $currency->descr;
+        else {
+            $results_div .= '<table><tbody>';
+            if($change->amount_due) {
+                $results_div .= '<tr scope="row"><th>Amount Due</th><td>';
+                $results_div .= sprintf('$%.2f', $change->amount_due);
                 $results_div .= '</td></tr>';
             }
+            $results_div .= '<tr><th scope="col">Quantity</th>'
+                . '<th scope="col">Currency</th></tr>';
+            if($change->currencies) {
+                foreach my $currency (@{$change->currencies}) {
+                    $results_div .= '<tr><td>';
+                    $results_div .= $currency->amount;
+                    $results_div .= '</td><td>';
+                    $results_div .= $currency->descr;
+                    $results_div .= '</td></tr>';
+                }
+            }
+            $results_div .= '</tbody></table>';
         }
-        $results_div .= '</tbody></table>';
         $results_div .= '</div>';
     }
 
@@ -139,6 +150,13 @@ sub create_usd {
             , Currency->new(value =>    1, descr => 'pennies')
         ]
     );
+}
+
+sub strip_non_numeric {
+    my($s) = @_;
+
+    $s =~ s/[^[:digit:].]//g;
+    return $s;
 }
 
 # vim: set sw=4 ts=4 et:

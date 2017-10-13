@@ -114,13 +114,14 @@ else {
     <link rel="stylesheet" href="style/style.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="scripts/ajax.js"></script>
   </head>
 
   <body>
     <div class="container-fluid">
       <div class="row">
         <div class="col-sm-4"></div>
-        <form action="$cgi_path" method="get" class="col-sm-4">
+        <form action="$cgi_path" method="get" id="change-form" class="col-sm-4">
           <div class="form-group">
             <label for="due">Amount due:</label>
             <input type="text" id="due" name="due" placeholder="Enter amount due" value="$due" class="form-control">

@@ -160,7 +160,7 @@ extends 'MoneySystem';
 
 use Scalar::Util qw/looks_like_number/;
 # Math::Currency would be preferrable to Math::Round but is unavailable
-use Math::Round qw/round/;
+use Math::Round qw/round nearest/;
 use Carp qw/croak confess/;
 
 has 'max_value' => (
@@ -237,9 +237,10 @@ sub make_change {
 
     my $change = ChangeDue->new();
 
-    $change->amount_due($tendered - $due);
+    $change->amount_due(nearest(0.01, $tendered - $due));
 
     # round in customer's favor when halfway between two choices
+    # e.g. if due = 4.995 and tendered = 10.00, provide 5.01 in change
     my $remainder = round(100 * $change->amount_due);
 
     # ensure that the currencies are in reverse sort order based on the value

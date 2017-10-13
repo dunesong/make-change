@@ -1,0 +1,7 @@
+RewriteEngine on
+
+RewriteCond %{DOCUMENT_ROOT}/style/%{REQUEST_URI} -f
+RewriteRule ^(.*) style/$1 [L]
+
+RewriteCond %{DOCUMENT_ROOT}/%{REQUEST_URI} !-f
+RewriteRule ^(.*) make-change.cgi [L] 

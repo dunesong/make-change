@@ -59,8 +59,9 @@ elsif($mode eq 'json') {
     ;
 }
 else {
-    my $results_div = '';
+    my $cgi_path = $q->url(-absolute => 1);
 
+    my $results_div = '';
     if($due && $tendered) {
         $results_div = '<div id="results" class="row">';
         $results_div .= '<div class="col-sm-4"></div>';
@@ -97,6 +98,7 @@ else {
         $results_div .= '</div>';
     }
 
+
     print $q->header(-charset => 'utf-8');
     print <<"HTML_FORM";
 <!doctype html>
@@ -118,7 +120,7 @@ else {
     <div class="container-fluid">
       <div class="row">
         <div class="col-sm-4"></div>
-        <form action="make-change.cgi" method="get" class="col-sm-4">
+        <form action="$cgi_path" method="get" class="col-sm-4">
           <div class="form-group">
             <label for="due">Amount due:</label>
             <input type="text" id="due" name="due" placeholder="Enter amount due" value="$due" class="form-control">

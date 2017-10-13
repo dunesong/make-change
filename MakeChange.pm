@@ -99,9 +99,11 @@ sub to_json {
     }
     if($self->currencies) {
         $json .= ', "currencies":[';
+        my @currencies = ();
         foreach my $currency (@{$self->currencies}) {
-            $json .= $currency->to_json()
+            push(@currencies, $currency->to_json());
         }
+        $json .= join(',', @currencies);
         $json .= ']';
     }
     $json .= '}';

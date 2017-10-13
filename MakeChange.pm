@@ -1,30 +1,4 @@
 ################################################################################
-# The ChangeTypes package collects the simple data types used in the other
-# classes.
-################################################################################
-
-package ChangeTypes;
-
-use Moose;
-use Moose::Util::TypeConstraints;
-
-subtype 'CurrencyCode'
-    # an ISO 4217 currency code (e.g. 'USD', 'JPY')
-    , as 'Str'
-    , where {/[A-Z]{3}/}
-;
-
-subtype 'ArrayRefOfCurrencies'
-    => as 'ArrayRef[Currency]'
-;
-coerce 'ArrayRefOfCurrencies', from 'Currency', via { [$_] };
-
-subtype 'ArrayRefOfCurrencyAmounts'
-    => as 'ArrayRef[CurrencyAmount]'
-;
-coerce 'ArrayRefOfCurrencyAmounts', from 'CurrencyAmount', via { [$_] };
-
-
 ################################################################################
 # The Currency class models a type of physical currency (i.e. a banknote 
 # or coin.
@@ -89,6 +63,13 @@ sub to_json {
 package ChangeDue;
 
 use Moose;
+use Moose::Util::TypeConstraints;
+
+subtype 'ArrayRefOfCurrencyAmounts'
+    => as 'ArrayRef[CurrencyAmount]'
+;
+
+coerce 'ArrayRefOfCurrencyAmounts', from 'CurrencyAmount', via { [$_] };
 
 has 'currencies' => (
     is => 'rw'
@@ -134,7 +115,18 @@ sub to_json {
 package MoneySystem;
 
 use Moose;
-use ChangeTypes;
+use Moose::Util::TypeConstraints;
+
+subtype 'CurrencyCode'
+    # an ISO 4217 currency code (e.g. 'USD', 'JPY')
+    , as 'Str'
+    , where {/[A-Z]{3}/}
+;
+
+subtype 'ArrayRefOfCurrencies'
+    => as 'ArrayRef[Currency]'
+;
+coerce 'ArrayRefOfCurrencies', from 'Currency', via { [$_] };
 
 has 'code' => (
     is => 'rw'

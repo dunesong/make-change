@@ -57,9 +57,26 @@ elsif($mode eq 'json') {
 }
 else {
     my $results_div = '';
+
     if($due && $tendered) {
         $results_div = '<div class="row">';
-        $results_div .= 'results go here';
+        $results_div .= '<table><tbody>';
+        if($change->amount_due) {
+            $results_div .= '<tr scope="row"><th>Amount Due</th><td>';
+            $results_div .= sprintf('$%.2f', $change->amount_due);
+            $results_div .= '</td></tr>';
+        }
+        $results_div .= '<tr><th scope="col">Quantity</th><th scope="col">Currency</th></tr>';
+        if($change->currencies) {
+            foreach my $currency (@{$change->currencies}) {
+                $results_div .= '<tr><td>';
+                $results_div .= $currency->amount;
+                $results_div .= '</td><td>';
+                $results_div .= $currency->descr;
+                $results_div .= '</td></tr>';
+            }
+        }
+        $results_div .= '</tbody></table>';
         $results_div .= '</div>';
     }
 

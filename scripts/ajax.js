@@ -11,6 +11,7 @@ $(function() {
                 result = JSON.parse(xhr.responseText);
                 message = "";
                 message += '<p class="alert alert-danger">';
+                message += '<strong>Error:</strong> ';
                 message += result.error;
                 message += "</p>";
                 $("#results").append(message);

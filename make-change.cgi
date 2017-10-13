@@ -74,8 +74,8 @@ else {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="make change based on amount due and amount tendered">
     <meta name="author" content="jonathan\@dunesong.com">
-      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-      <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
   </head>
@@ -83,14 +83,14 @@ else {
   <body>
     <div class="container-fluid">
       <div class="row">
-        <form action="make-change.cgi" class="form-inline">
+        <form action="make-change.cgi" method="get" class="form-inline">
           <div class="form-group">
-            <label for="amount-due">Amount due:</label>
-            <input type="number" id="amount-due" placeholder="Enter amount due" value="$due" class="form-control">
+            <label for="due">Amount due:</label>
+            <input type="text" id="due" name="due" placeholder="Enter amount due" value="$due" class="form-control">
           </div>
           <div class="form-group">
-            <label for="amount-tendered">Amount tendered:</label>
-            <input type="number" id="amount-tendered" placeholder="Enter amount tendered" value="$tendered" class="form-control">
+            <label for="tendered">Amount tendered:</label>
+            <input type="text" id="tendered" name="tendered" placeholder="Enter amount tendered" value="$tendered" class="form-control">
           </div>
           <button type="submit" class="btn btn-default">Make Change</button>
         </form>

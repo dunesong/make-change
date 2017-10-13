@@ -1,39 +1,50 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl -w
 
 use strict;
 use warnings;
-
-use 5.010;
 
 use File::Basename qw/basename dirname/;
 use Cwd qw/abs_path/;
 use lib dirname(abs_path(__FILE__));
 
+use CGI;
 use MakeChange;
 
 ################################################################################
 
-test_usage();
-
-my($due, $tendered) = @ARGV;
+my $q = CGI->new;
 
 my $usd = create_usd();
 
-my $change = $usd->make_change($due, $tendered);
+my $due = $q->param('due');
+my $tendered = $q->param('tendered');
+my $mode = $q->param('mode');
+$mode = 'html' unless defined $mode;
 
-printf("\$%.2f change is due\n", $change->amount_due);
-foreach my $currency (@{$change->currencies}) {
-    printf("%d x %s\n", $currency->amount, $currency->descr);
-}
+my $change = $usd->make_change($due, $tendered);
 
 ################################################################################
 
-sub test_usage {
-    my $PROGRAM = basename($0);
-    my $USAGE = "usage: $PROGRAM amount_due amount_tendered";
-
-    die "$USAGE\n" unless(scalar(@ARGV) == 2);
+if(defined $change->{error}) {
+    my $http_status = '400 Bad Request (invalid input parameters)';
+    print $q->header(-status => $http_status, -charset => 'utf-8')
+        , $q->start_html(
+            -title => 'Invalid Input Parameters'
+            , -encoding => 'utf-8'
+          )
+        , $q->h1($http_status)
+        , $q->p($change->{error})
+        , $q->end_html
+    ;
 }
+elsif($mode eq 'json') {
+    print $q->header(-type => 'application/json', -charset => 'utf-8')
+        , $change->to_json()
+        , "\n"
+    ;
+}
+
+################################################################################
 
 sub create_usd {
     return ChangeMaker->new(

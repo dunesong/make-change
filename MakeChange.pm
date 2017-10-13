@@ -1,6 +1,6 @@
 ################################################################################
 ################################################################################
-# The Currency class models a type of physical currency (i.e. a banknote 
+# The Currency class models a type of physical currency (i.e. a banknote
 # or coin.
 ################################################################################
 
@@ -163,35 +163,75 @@ use Scalar::Util qw/looks_like_number/;
 use Math::Round qw/round/;
 use Carp qw/croak confess/;
 
+has 'max_value' => (
+    # more US dollars than are in the M0 cash supply
+    is => 'ro'
+    , isa => 'Int'
+    , default => 2000000000000
+);
+
+has 'max_length' => (
+    is => 'ro'
+    , isa => 'Int'
+    , default => 16
+);
+
 sub make_change {
     my ($self, $due, $tendered) = @_;
 
-    unless(looks_like_number($due)) {
-        return ChangeDue->new(error => "amount due ($due) is not a number");
-    }
-    
-    unless(looks_like_number($tendered)) { 
+    unless(length($due) < $self->max_length) {
         return ChangeDue->new(
-            error => "amount tendered ($tendered) is not a number"
+            error => 'amount due exceeds the maximum argument length ('
+                . $self->max_length
+                . ' characters)'
+        );
+    }
+
+    unless(length($tendered) < $self->max_length) {
+        return ChangeDue->new(
+            error => 'amount tendered exceeds the maximum argument length ('
+                . $self->max_length
+                . ' characters)'
+        );
+    }
+
+    unless(looks_like_number($due)) {
+        return ChangeDue->new(error => 'amount due is not a number');
+    }
+
+    unless(looks_like_number($tendered)) {
+        return ChangeDue->new(
+            error => 'amount tendered is not a number'
+        );
+    }
+
+    unless($due < $self->max_value) {
+        return ChangeDue->new(
+            error => 'amount due exceeds the maximum value ('
+                . $self->max_value
+                . ')'
+        );
+    }
+
+    unless($tendered < $self->max_value) {
+        return ChangeDue->new(
+            error => 'amount tendered exceeds the maximum value ('
+                . $self->max_value
+                . ')'
         );
     }
 
     unless($due >= 0) {
-        return ChangeDue->new(
-            error => "amount due ($due) must be non-negative"
-        );
+        return ChangeDue->new(error => 'amount due must be non-negative');
     }
 
     unless($tendered >= 0) {
-        return ChangeDue->new(
-            error => "amount tendered ($tendered) must be non-negative"
-        );
+        return ChangeDue->new(error => 'amount tendered must be non-negative');
     }
 
     unless($tendered >= $due) {
         return ChangeDue->new(
-            error => "amount tendered ($tendered) must not be less than "
-                     . "amount due ($due)"
+            error => 'amount tendered must not be less than amount due'
         );
     }
 
@@ -203,7 +243,7 @@ sub make_change {
     my $remainder = round(100 * $change->amount_due);
 
     # ensure that the currencies are in reverse sort order based on the value
-    my @sorted_currencies = 
+    my @sorted_currencies =
         sort {$b->{value} <=> $a->{value}} @{$self->{currencies}};
 
     foreach my $currency (@sorted_currencies) {

@@ -15,11 +15,16 @@ use MakeChange;
 my $q = CGI->new;
 
 my $usd = create_usd();
+my $due = '';
+my $tendered = '';
+my $mode = 'html';
 
-my $due = $q->param('due');
-my $tendered = $q->param('tendered');
-my $mode = $q->param('mode');
-$mode = 'html' unless defined $mode;
+$due = strip_non_numeric($q->param('due'))
+    if(defined $q->param('due'));
+$tendered = strip_non_numeric($q->param('tendered'))
+    if(defined $q->param('tendered'));
+$mode = $q->param('mode')
+    if(defined $q->param('mode'));
 
 my $change = $usd->make_change($due, $tendered);
 
@@ -35,7 +40,7 @@ if($q->cgi_error) {
         , $q->end_html
     ;
 }
-elsif(defined $change->{error}) {
+elsif($mode eq 'json' && defined $change->{error}) {
     my $http_status = '400 Bad Request (invalid input parameters)';
     print $q->header(-status => $http_status, -charset => 'utf-8')
         , $q->start_html(
@@ -52,6 +57,87 @@ elsif($mode eq 'json') {
         , $change->to_json()
         , "\n"
     ;
+}
+else {
+    my $cgi_path = $q->url(-absolute => 1);
+
+    my $results_div = '';
+    if($due && $tendered) {
+        $results_div = '<div id="results" class="row">';
+        $results_div .= '<div class="col-sm-4"></div>';
+        if(defined $change->error) {
+            $results_div .= '<p class="alert alert-danger col-sm-4">';
+            $results_div .= $change->error;
+            $results_div .= '</p>';
+        }
+        else {
+            $results_div .= '<div class="col-sm-4">';
+            $results_div .= '<table class="table table-striped"><tbody>';
+            if($change->amount_due) {
+                $results_div .= '<tr scope="row" class="info">';
+                $results_div .= '<th>Amount Due</th><td>';
+                $results_div .= sprintf('$%.2f', $change->amount_due);
+                $results_div .= '</td></tr>';
+            }
+            $results_div .= '<tr>'
+                . '<th scope="col" id="quantity-header">Quantity</th>'
+                . '<th scope="col">Currency</th></tr>';
+            if($change->currencies) {
+                foreach my $currency (@{$change->currencies}) {
+                    $results_div .= '<tr><td align="right">';
+                    $results_div .= $currency->amount;
+                    $results_div .= ' &times;</td><td>';
+                    $results_div .= $currency->descr;
+                    $results_div .= '</td></tr>';
+                }
+            }
+            $results_div .= '</tbody></table>';
+            $results_div .= '</div>';
+        }
+        $results_div .= '<div class="col-sm-4"></div>';
+        $results_div .= '</div>';
+    }
+
+
+    print $q->header(-charset => 'utf-8');
+    print <<"HTML_FORM";
+<!doctype html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Make Change</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="make change based on amount due and amount tendered">
+    <meta name="author" content="jonathan\@dunesong.com">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style/style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  </head>
+
+  <body>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-4"></div>
+        <form action="$cgi_path" method="get" class="col-sm-4">
+          <div class="form-group">
+            <label for="due">Amount due:</label>
+            <input type="text" id="due" name="due" placeholder="Enter amount due" value="$due" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="tendered">Amount tendered:</label>
+            <input type="text" id="tendered" name="tendered" placeholder="Enter amount tendered" value="$tendered" class="form-control">
+          </div>
+          <button type="submit" class="btn btn-default">Make Change</button>
+        </form>
+        <div class="col-sm-4"></div>
+      </div>
+      $results_div
+    </div>
+  </body>
+</html>
+HTML_FORM
 }
 
 exit 0;
@@ -74,6 +160,13 @@ sub create_usd {
             , Currency->new(value =>    1, descr => 'pennies')
         ]
     );
+}
+
+sub strip_non_numeric {
+    my($s) = @_;
+
+    $s =~ s/[^[:digit:].]//g;
+    return $s;
 }
 
 # vim: set sw=4 ts=4 et:

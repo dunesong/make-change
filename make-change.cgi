@@ -25,7 +25,17 @@ my $change = $usd->make_change($due, $tendered);
 
 ################################################################################
 
-if(defined $change->{error}) {
+if($q->cgi_error) {
+    print $q->header(-status => $q->cgi_error, -charset => 'utf-8')
+        , $q->start_html(
+            -title => 'CGI Error'
+            , -encoding => 'utf-8'
+          )
+        , $q->h1($q->cgi_error)
+        , $q->end_html
+    ;
+}
+elsif(defined $change->{error}) {
     my $http_status = '400 Bad Request (invalid input parameters)';
     print $q->header(-status => $http_status, -charset => 'utf-8')
         , $q->start_html(
@@ -43,6 +53,8 @@ elsif($mode eq 'json') {
         , "\n"
     ;
 }
+
+exit 0;
 
 ################################################################################
 

@@ -1,3 +1,13 @@
+<Files *\.pl>
+order allow,deny
+deny from all
+</Files>
+
+<Files *\.pm>
+order allow,deny
+deny from all
+</Files>
+
 RewriteEngine on
 
 RewriteCond %{DOCUMENT_ROOT}/scripts/%{REQUEST_URI} -f

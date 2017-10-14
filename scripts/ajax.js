@@ -21,7 +21,7 @@ $(function() {
                 message += '<table class="table table-striped">';
                 message += '<tbody>';
                 message += '<tr scope="row" class="info">';
-                message += '<th>Amount Due</th><td>';
+                message += '<th>Change Amount</th><td>';
                 if(result.amount_due || 0 == result.amount_due) {
                     message += '$' + result.amount_due.toFixed(2);
                 }

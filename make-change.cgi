@@ -71,7 +71,7 @@ else {
         else {
             $results_div .= '<table class="table table-striped"><tbody>';
             $results_div .= '<tr scope="row" class="info">';
-            $results_div .= '<th>Amount Due</th><td>';
+            $results_div .= '<th>Change Amount</th><td>';
             if($change->amount_due || 0 == $change->amount_due) {
                 $results_div .= sprintf('$%.2f', $change->amount_due);
             }

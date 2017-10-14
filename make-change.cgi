@@ -61,7 +61,7 @@ else {
     my $cgi_path = $q->url(-absolute => 1);
 
     my $results_div = '';
-    if($due && $tendered) {
+    if($due ne '' || $tendered ne '') {
         if(defined $change->error) {
             $results_div .= '<p class="alert alert-danger">';
             $results_div .= '<strong>Error:</strong> ';
@@ -70,16 +70,16 @@ else {
         }
         else {
             $results_div .= '<table class="table table-striped"><tbody>';
+            $results_div .= '<tr scope="row" class="info">';
+            $results_div .= '<th>Amount Due</th><td>';
             if($change->amount_due || 0 == $change->amount_due) {
-                $results_div .= '<tr scope="row" class="info">';
-                $results_div .= '<th>Amount Due</th><td>';
                 $results_div .= sprintf('$%.2f', $change->amount_due);
-                $results_div .= '</td></tr>';
             }
-            $results_div .= '<tr>'
-                . '<th scope="col" id="quantity-header">Quantity</th>'
-                . '<th scope="col">Currency</th></tr>';
-            if($change->currencies) {
+            $results_div .= '</td></tr>';
+            if(scalar(@{$change->currencies}) > 0) {
+                $results_div .= '<tr>'
+                  . '<th scope="col" id="quantity-header">Quantity</th>'
+                  . '<th scope="col">Currency</th></tr>';
                 foreach my $currency (@{$change->currencies}) {
                     $results_div .= '<tr><td align="right">';
                     $results_div .= $currency->amount;
@@ -118,11 +118,11 @@ else {
         <form action="$cgi_path" method="get" id="change-form" class="col-sm-4">
           <div class="form-group">
             <label for="due">Amount due:</label>
-            <input type="text" id="due" name="due" placeholder="Enter amount due" value="$due" class="form-control">
+            <input type="number" min="0" step="0.01" id="due" name="due" placeholder="Enter amount due" value="$due" class="form-control">
           </div>
           <div class="form-group">
             <label for="tendered">Amount tendered:</label>
-            <input type="text" id="tendered" name="tendered" placeholder="Enter amount tendered" value="$tendered" class="form-control">
+            <input type="number" min="0" step="0.01" id="tendered" name="tendered" placeholder="Enter amount tendered" value="$tendered" class="form-control">
           </div>
           <button type="submit" class="btn btn-default">Make Change</button>
         </form>

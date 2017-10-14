@@ -36,7 +36,12 @@ $(function() {
                         message += '<tr><td align="right">';
                         message += field.amount;
                         message += " &times;</td><td>";
-                        message += field.descr;
+                        if(field.amount > 1) {
+                            message += field.descr;
+                        }
+                        else {
+                            message += field.descr_sing;
+                        }
                         message += '</td></tr>';
                     });
                 }

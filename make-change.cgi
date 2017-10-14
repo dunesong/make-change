@@ -118,11 +118,11 @@ else {
         <form action="$cgi_path" method="get" id="change-form" class="col-sm-4">
           <div class="form-group">
             <label for="due">Amount due:</label>
-            <input type="text" id="due" name="due" placeholder="Enter amount due" value="$due" class="form-control">
+            <input type="number" min="0" step="0.01" id="due" name="due" placeholder="Enter amount due" value="$due" class="form-control">
           </div>
           <div class="form-group">
             <label for="tendered">Amount tendered:</label>
-            <input type="text" id="tendered" name="tendered" placeholder="Enter amount tendered" value="$tendered" class="form-control">
+            <input type="number" min="0" step="0.01" id="tendered" name="tendered" placeholder="Enter amount tendered" value="$tendered" class="form-control">
           </div>
           <button type="submit" class="btn btn-default">Make Change</button>
         </form>

@@ -20,18 +20,18 @@ $(function() {
                 message = "";
                 message += '<table class="table table-striped">';
                 message += '<tbody>';
+                message += '<tr scope="row" class="info">';
+                message += '<th>Amount Due</th><td>';
                 if(result.amount_due || 0 == result.amount_due) {
-                    message += '<tr scope="row" class="info">';
-                    message += '<th>Amount Due</th><td>';
                     message += '$' + result.amount_due.toFixed(2);
-                    message += '</td></tr>';
                 }
-                message += '<tr>';
-                message += '<th scope="col" id="quantity-header">';
-                message += 'Quantity';
-                message += '</th>';
-                message += '<th scope="col">Currency</th></tr>';
-                if(result.currencies) {
+                message += '</td></tr>';
+                if(result.currencies && result.currencies.length > 0) {
+                    message += '<tr>';
+                    message += '<th scope="col" id="quantity-header">';
+                    message += 'Quantity';
+                    message += '</th>';
+                    message += '<th scope="col">Currency</th></tr>';
                     $.each(result.currencies, function(i, field) {
                         message += '<tr><td align="right">';
                         message += field.amount;

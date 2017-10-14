@@ -70,16 +70,16 @@ else {
         }
         else {
             $results_div .= '<table class="table table-striped"><tbody>';
+            $results_div .= '<tr scope="row" class="info">';
+            $results_div .= '<th>Amount Due</th><td>';
             if($change->amount_due || 0 == $change->amount_due) {
-                $results_div .= '<tr scope="row" class="info">';
-                $results_div .= '<th>Amount Due</th><td>';
                 $results_div .= sprintf('$%.2f', $change->amount_due);
-                $results_div .= '</td></tr>';
             }
-            $results_div .= '<tr>'
-                . '<th scope="col" id="quantity-header">Quantity</th>'
-                . '<th scope="col">Currency</th></tr>';
-            if($change->currencies) {
+            $results_div .= '</td></tr>';
+            if(scalar(@{$change->currencies}) > 0) {
+                $results_div .= '<tr>'
+                  . '<th scope="col" id="quantity-header">Quantity</th>'
+                  . '<th scope="col">Currency</th></tr>';
                 foreach my $currency (@{$change->currencies}) {
                     $results_div .= '<tr><td align="right">';
                     $results_div .= $currency->amount;

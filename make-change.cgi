@@ -61,7 +61,7 @@ else {
     my $cgi_path = $q->url(-absolute => 1);
 
     my $results_div = '';
-    if($due ne '' || $tendered ne '' || defined $change->error) {
+    if($due ne '' || $tendered ne '') {
         if(defined $change->error) {
             $results_div .= '<p class="alert alert-danger">';
             $results_div .= '<strong>Error:</strong> ';

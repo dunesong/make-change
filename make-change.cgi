@@ -71,7 +71,7 @@ else {
         else {
             $results_div .= '<table class="table table-striped"><tbody>';
             $results_div .= '<tr scope="row" class="info">';
-            $results_div .= '<th>Amount Due</th><td>';
+            $results_div .= '<th>Change Amount</th><td>';
             if($change->amount_due || 0 == $change->amount_due) {
                 $results_div .= sprintf('$%.2f', $change->amount_due);
             }
@@ -84,7 +84,12 @@ else {
                     $results_div .= '<tr><td align="right">';
                     $results_div .= $currency->amount;
                     $results_div .= ' &times;</td><td>';
-                    $results_div .= $currency->descr;
+                    if($currency->amount > 1) {
+                        $results_div .= $currency->descr;
+                    }
+                    else {
+                        $results_div .= $currency->descr_sing;
+                    }
                     $results_div .= '</td></tr>';
                 }
             }
@@ -151,14 +156,46 @@ sub create_usd {
         , descr => 'United States Dollar'
         , currencies => [
             # in descending order
-              Currency->new(value => 2000, descr => '$20 bills')
-            , Currency->new(value => 1000, descr => '$10 bills')
-            , Currency->new(value =>  500, descr => '$5 bills')
-            , Currency->new(value =>  100, descr => '$1 bills')
-            , Currency->new(value =>   25, descr => 'quarters')
-            , Currency->new(value =>   10, descr => 'dimes')
-            , Currency->new(value =>    5, descr => 'nickels')
-            , Currency->new(value =>    1, descr => 'pennies')
+            Currency->new(
+              value => 2000
+              , descr => '$20 bills'
+              , descr_sing => '$20 bill'
+            )
+            , Currency->new(
+              value => 1000
+              , descr => '$10 bills'
+              , descr_sing => '$10 bill'
+            )
+            , Currency->new(
+              value =>  500
+              , descr => '$5 bills'
+              , descr_sing => '$5 bill'
+            )
+            , Currency->new(
+              value =>  100
+              , descr => '$1 bills'
+              , descr_sing => '$1 bill'
+            )
+            , Currency->new(
+              value =>   25
+              , descr => 'quarters'
+              , descr_sing => 'quarter'
+            )
+            , Currency->new(
+              value =>   10
+              , descr => 'dimes'
+              , descr_sing => 'dime'
+            )
+            , Currency->new(
+              value =>    5
+              , descr => 'nickels'
+              , descr_sing => 'nickel'
+            )
+            , Currency->new(
+              value =>    1
+              , descr => 'pennies'
+              , descr_sing => 'penny'
+            )
         ]
     );
 }

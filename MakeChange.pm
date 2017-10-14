@@ -17,7 +17,13 @@ has 'value' => (
 );
 
 has 'descr' => (
-    # human-friendly description
+    # human-friendly description of plural currency, e.g. "pennies"
+    is => 'rw'
+    , isa => 'Str'
+);
+
+has 'descr_sing' => (
+    # human-friendly description of singular currency, e.g. "penny"
     is => 'rw'
     , isa => 'Str'
 );
@@ -52,6 +58,9 @@ sub to_json {
     }
     if($self->descr) {
         push(@fields, sprintf('"descr": "%s"', $self->descr));
+    }
+    if($self->descr_sing) {
+        push(@fields, sprintf('"descr_sing": "%s"', $self->descr_sing));
     }
     $json .= join(',', @fields);
     $json .= '}';
@@ -260,6 +269,7 @@ sub make_change {
                 amount => int($remainder / $currency->{value})
                 , value => $currency->value
                 , descr => $currency->descr
+                , descr_sing => $currency->descr_sing
             ));
             $remainder = $remainder % $currency->{value};
         }

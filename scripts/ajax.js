@@ -21,7 +21,7 @@ $(function() {
                 message += '<table class="table table-striped">';
                 message += '<tbody>';
                 message += '<tr scope="row" class="info">';
-                message += '<th>Amount Due</th><td>';
+                message += '<th>Change Amount</th><td>';
                 if(result.amount_due || 0 == result.amount_due) {
                     message += '$' + result.amount_due.toFixed(2);
                 }
@@ -36,7 +36,12 @@ $(function() {
                         message += '<tr><td align="right">';
                         message += field.amount;
                         message += " &times;</td><td>";
-                        message += field.descr;
+                        if(field.amount > 1) {
+                            message += field.descr;
+                        }
+                        else {
+                            message += field.descr_sing;
+                        }
                         message += '</td></tr>';
                     });
                 }
